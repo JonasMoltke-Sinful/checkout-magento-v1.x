@@ -66,7 +66,7 @@ class Bambora_Online_Model_Checkout_Payment extends Mage_Payment_Model_Method_Ab
     public function getApiKey($storeId = null)
     {
         if (empty($this->_apiKey)) {
-            $storeId = isset($storeId) ? $this->getStore()->getId() : $storeId;
+            $storeId = isset($storeId) ? $storeId : $this->getStore()->getId();
 
             $accesstoken = $this->getConfigData(BamboraConstant::ACCESS_TOKEN, $storeId);
             $merchantNumber = $this->getConfigData(BamboraConstant::MERCHANT_NUMBER, $storeId);
@@ -325,6 +325,7 @@ class Bambora_Online_Model_Checkout_Payment extends Mage_Payment_Model_Method_Ab
             /** @var Mage_Sales_Model_Order */
             $order = $payment->getOrder();
 
+            $storeId = $order->getStoreId();
             $currency = $order->getBaseCurrencyCode();
             $minorunits = $this->bamboraHelper->getCurrencyMinorunits($currency);
 
@@ -344,7 +345,7 @@ class Bambora_Online_Model_Checkout_Payment extends Mage_Payment_Model_Method_Ab
 
             /** @var Bambora_Online_Model_Api_Checkout_Transaction */
             $transactionApi = Mage::getModel(CheckoutApi::API_TRANSACTION);
-            $captureResponse = $transactionApi->capture($transactionId, $captureRequest, $this->getApiKey());
+            $captureResponse = $transactionApi->capture($transactionId, $captureRequest, $this->getApiKey($storeId));
 
             $message = "";
             if (!$this->bamboraHelper->validateCheckoutApiResult($captureResponse, $order->getIncrementId(), true, $message)) {
